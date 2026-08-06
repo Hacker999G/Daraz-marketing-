@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fly Cash 🚀 টাকা উড়াও 💸</title>
+    <title>Daraz Marketing Bd 🚀 টাকা উড়াও 💸</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -141,14 +141,14 @@
                 </svg>
             </div>
         </div>
-        <h1 class="text-4xl font-black text-[#00E5FF] mb-2">Fly Cash</h1>
+        <h1 class="text-4xl font-black text-[#00E5FF] mb-2">Daraz Marketing Bd</h1>
         <p class="text-sm font-bold text-[#94a3b8] tracking-widest uppercase">ডেটা লোড হচ্ছে...</p>
     </div>
 
     <div class="min-h-screen pb-24 relative">
         <!-- Sticky Header -->
         <div class="sticky top-0 z-40 bg-[#112240]/80 backdrop-blur-md border-b border-[#233554] px-4 py-3">
-            <h1 class="text-2xl font-bold text-[#00E5FF] text-center tracking-tight">Fly Cash 🚀 টাকা উড়াও 💸 ✓</h1>
+            <h1 class="text-2xl font-bold text-[#00E5FF] text-center tracking-tight">Daraz Marketing Bd 🚀 টাকা উড়াও 💸 ✓</h1>
         </div>
 
                 <!-- ================= HOME VIEW ================= -->
@@ -741,14 +741,15 @@
     <script>
         // ১. আপনার Firebase প্রজেক্টের কনফিগারেশন
         const firebaseConfig = {
-            apiKey: "AIzaSyAle4q_TRJoMeQc_LtusSI2s4FtXQyfha4",
-            authDomain: "flycashdemo.firebaseapp.com",
-            databaseURL: "https://flycashdemo-default-rtdb.firebaseio.com",
-            projectId: "flycashdemo",
-            storageBucket: "flycashdemo.firebasestorage.app",
-            messagingSenderId: "431352487997",
-            appId: "1:431352487997:web:2c12a04f751a97ed1c0a54"
-        };
+  apiKey: "AIzaSyC4P9iviHSbfSmTo9hp3cKZITN71YJfcOo",
+  authDomain: "daraz-marketing-bd.firebaseapp.com",
+  databaseURL: "https://daraz-marketing-bd-default-rtdb.firebaseio.com",
+  projectId: "daraz-marketing-bd",
+  storageBucket: "daraz-marketing-bd.firebasestorage.app",
+  messagingSenderId: "191894175143",
+  appId: "1:191894175143:web:cd1a64d11f1056780b4a82",
+  measurementId: "G-JRSFSB6YS7"
+};
 
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -787,7 +788,7 @@
             document.getElementById('ui-wallet-initial').innerText = userName.charAt(0).toUpperCase();
 
             db.ref('settings/botUsername').on('value', (snap) => {
-                const botUsername = snap.val() || "NanoEarn_bot";
+                const botUsername = snap.val() || "DarazMarketingBd_Bot";
                 document.getElementById('refLinkInput').value = `https://t.me/${botUsername}/app?startapp=${userId}`;
             });
 
