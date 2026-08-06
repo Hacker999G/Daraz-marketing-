@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fly Cash 🚀 - Pro Admin Panel</title>
+    
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0B0F19;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0B0F19; }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 700; color: #94A3B8; margin-bottom: 0.5rem; }
+        .form-input {
+            width: 100%; padding: 0.8rem 1rem; background: #0F172A; border: 1px solid #334155;
+            border-radius: 0.75rem; color: #F8FAFC; font-size: 0.95rem; transition: all 0.2s; outline: none;
+        }
+        .form-input:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3B82F6, #2563EB); color: white; padding: 0.8rem 1.5rem; 
+            border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; border: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* Dashboard Tabs */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-item {
+            padding: 0.8rem 1rem; border-radius: 0.75rem; font-weight: 600; color: #94A3B8;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .nav-item i { width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover { background: #1E293B; color: white; }
+        .nav-item.active { background: #3B82F6; color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2); }
+
+        /* Tables */
+        .clean-table { width: 100%; border-collapse: collapse; }
+        .clean-table th { padding: 1rem; font-size: 0.85rem; font-weight: 700; color: #94A3B8; border-bottom: 1px solid #334155; text-transform: uppercase; white-space: nowrap; }
+        .clean-table td { padding: 1rem; border-bottom: 1px solid #1E293B; vertical-align: middle; }
+        .clean-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .bg-success { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .bg-warning { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .bg-danger { background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .bg-info { background: rgba(14, 165, 233, 0.15); color: #0EA5E9; border: 1px solid rgba(14, 165, 233, 0.3); }
+    </style>
+</head>
+<body class="selection:bg-[#3B82F6]/30">
+
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-[#3B82F6]/20 blur-[100px] rounded-full -z-10"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-[#8B5CF6]/20 blur-[100px] rounded-full -z-10"></div>
+
+        <div class="bg-[#1E293B]/80 backdrop-blur-xl p-8 rounded-3xl border border-[#334155] shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-[#3B82F6]/10 border border-[#3B82F6]/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-halved text-3xl text-[#3B82F6]"></i>
+                </div>
+                <h1 class="text-2xl font-black text-white mb-1">Admin Portal</h1>
+                <p class="text-slate-400 font-semibold text-sm">Fly Cash Secure Access</p>
+            </div>
+
+            <div class="form-group relative">
+                <i class="fas fa-envelope absolute left-4 top-[14px] text-slate-500"></i>
+                <input type="email" id="admin-email" class="form-input pl-10" placeholder="Admin Email">
+            </div>
+            <div class="form-group mb-6 relative">
+                <i class="fas fa-lock absolute left-4 top-[14px] text-slate-500"></i>
+                <input type="password" id="admin-password" class="form-input pl-10" placeholder="••••••••">
+            </div>
+
+            <button onclick="loginAdmin()" class="btn-primary w-full" id="login-btn">Login to Dashboard</button>
+            <div id="login-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-bold text-center p-3 rounded-xl mt-4"></div>
+        </div>
+    </div>
+
+    <!-- ================= ADMIN DASHBOARD ================= -->
+    <div id="dashboard-screen" class="hidden min-h-screen flex flex-col md:flex-row">
+        
+        <!-- Sidebar Navigation -->
+        <div class="w-full md:w-64 bg-[#1E293B] border-r border-[#334155] flex flex-col h-auto md:h-screen sticky top-0 z-50 shadow-xl">
+            <div class="p-6 border-b border-[#334155]">
+                <h2 class="text-xl font-black text-white flex items-center gap-2">
+                    <i class="fas fa-wallet text-[#3B82F6]"></i> Fly Cash
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">Admin Control Panel</p>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
+                <div onclick="switchTab('settings')" id="nav-settings" class="nav-item active whitespace-nowrap"><i class="fas fa-sliders"></i> অ্যাপ সেটিংস</div>
+                <div onclick="switchTab('notification')" id="nav-notification" class="nav-item whitespace-nowrap"><i class="fas fa-bullhorn"></i> নোটিফিকেশন</div>
+                <div onclick="switchTab('tasks')" id="nav-tasks" class="nav-item whitespace-nowrap"><i class="fas fa-list-check"></i> টাস্ক ম্যানেজমেন্ট</div>
+                <div onclick="switchTab('task-verify')" id="nav-task-verify" class="nav-item whitespace-nowrap"><i class="fas fa-check-double"></i> টাস্ক ভেরিফাই</div>
+                <div onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-item whitespace-nowrap"><i class="fas fa-money-bill-transfer"></i> উইথড্র রিকোয়েস্ট</div>
+                <div onclick="switchTab('users')" id="nav-users" class="nav-item whitespace-nowrap"><i class="fas fa-users-gear"></i> ইউজার প্রোফাইল</div>
+            </div>
+
+            <div class="p-4 border-t border-[#334155] hidden md:block">
+                <button onclick="logoutAdmin()" class="w-full bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/30 p-3 rounded-xl font-bold hover:bg-[#EF4444] hover:text-white transition flex items-center justify-center gap-2">
+                    <i class="fas fa-power-off"></i> লগআউট
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 p-4 md:p-8 max-h-screen overflow-y-auto bg-[#0B0F19]">
+            
+            <!-- 1. Settings View -->
+            <div id="settings-view" class="tab-content active max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 border-b border-[#334155] pb-4">অ্যাপ সেটিংস কন্ট্রোল</h2>
+                
+                <div class="space-y-6">
+                    <!-- Basic & Support -->
+                    <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                        <h3 class="text-[#3B82F6] font-bold mb-4 flex items-center gap-2"><i class="fas fa-robot"></i> বেসিক ও সাপোর্ট সেটিংস</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group"><label class="form-label">Bot Username (উদা: FlyCash_bot)</label><input type="text" id="set-bot-username" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">সাপোর্ট টেলিগ্রাম লিংক</label><input type="text" id="set-support" class="form-input"></div>
+                            <div class="form-group md:col-span-2"><label class="form-label">টিউটোরিয়াল ভিডিও লিংক</label><input type="text" id="set-tutorial" class="form-input"></div>
+                        </div>
+                    </div>
+
+                    <!-- Ads & Rewards -->
+                    <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                        <h3 class="text-[#3B82F6] font-bold mb-4 flex items-center gap-2"><i class="fas fa-gift"></i> অ্যাড, রেফার ও মিস্ট্রি বক্স</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group"><label class="form-label">প্রতি অ্যাডে রিওয়ার্ড (TK)</label><input type="number" id="set-ad-reward" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">প্রতি রেফারে বোনাস (TK)</label><input type="number" id="set-ref-bonus" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">GigaPub Zone ID</label><input type="text" id="set-gigapub" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">Adsgram Block ID</label><input type="text" id="set-adsgram" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">মিস্ট্রি বক্স (সর্বনিম্ন TK)</label><input type="number" id="set-box-min" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">মিস্ট্রি বক্স (সর্বোচ্চ TK)</label><input type="number" id="set-box-max" class="form-input"></div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Bonus -->
+                    <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                        <h3 class="text-[#3B82F6] font-bold mb-4 flex items-center gap-2"><i class="fas fa-calendar-check"></i> ডেইলি বোনাস সেটিংস (TK)</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="form-group"><label class="form-label">১ম দিন</label><input type="number" id="db-1" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">২য় দিন</label><input type="number" id="db-2" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">৩য় দিন</label><input type="number" id="db-3" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">৪র্থ দিন</label><input type="number" id="db-4" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">৫ম দিন</label><input type="number" id="db-5" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">৬ষ্ঠ দিন</label><input type="number" id="db-6" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">৭ম দিন</label><input type="number" id="db-7" class="form-input"></div>
+                        </div>
+                    </div>
+
+                    <!-- Withdraw Settings -->
+                    <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                        <h3 class="text-[#3B82F6] font-bold mb-4 flex items-center gap-2"><i class="fas fa-building-columns"></i> উইথড্র সেটিংস</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group"><label class="form-label">মিনিমাম উইথড্র (TK)</label><input type="number" id="set-min-withdraw" class="form-input"></div>
+                            <div class="form-group"><label class="form-label">উইথড্র মেথড (কমা দিয়ে লিখুন)</label><input type="text" id="set-methods" class="form-input" placeholder="bKash, Nagad"></div>
+                            <div class="form-group md:col-span-2"><label class="form-label">উইথড্র নোটিশ (ইউজারদের জন্য)</label><input type="text" id="set-withdraw-note" class="form-input" placeholder="উইথড্র পেতে ২৪ ঘণ্টা সময় লাগতে পারে"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center pb-10">
+                    <button onclick="saveSettings()" class="btn-primary w-full md:w-auto md:px-12 py-4 text-lg"><i class="fas fa-save mr-2"></i> সব সেটিংস সেভ করুন</button>
+                </div>
+            </div>
+
+            <!-- 2. Notification View -->
+            <div id="notification-view" class="tab-content max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 border-b border-[#334155] pb-4">গ্লোবাল নোটিফিকেশন</h2>
+                <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                    <div class="bg-[#0F172A] border border-[#3B82F6]/30 p-4 rounded-xl mb-6 flex gap-4 items-start">
+                        <i class="fas fa-circle-info text-[#3B82F6] mt-1"></i>
+                        <p class="text-sm text-slate-300">এখানে মেসেজ লিখে সেন্ড করলে অ্যাপে থাকা সব ইউজারের Notification Bell এ লাল ডট শো করবে এবং ক্লিক করলে এই মেসেজটি দেখতে পাবে।</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">আপনার মেসেজ লিখুন</label>
+                        <textarea id="global-notification" class="form-input h-40 resize-y" placeholder="হ্যালো ইউজার, আজকে নতুন টাস্ক অ্যাড করা হয়েছে..."></textarea>
+                    </div>
+                    <button onclick="sendNotification()" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i> নোটিফিকেশন পাঠান</button>
+                </div>
+            </div>
+
+            <!-- 3. Tasks View -->
+            <div id="tasks-view" class="tab-content max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 border-b border-[#334155] pb-4">টাস্ক ম্যানেজমেন্ট</h2>
+                
+                <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg mb-8">
+                    <h3 class="font-bold text-[#3B82F6] mb-4 flex items-center gap-2"><i class="fas fa-plus-circle"></i> নতুন টাস্ক যোগ করুন</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="form-group mb-0"><label class="form-label text-xs">টাস্কের নাম</label><input type="text" id="task-title" class="form-input" placeholder="উদা: ফলো ফেসবুক"></div>
+                        <div class="form-group mb-0"><label class="form-label text-xs">রিওয়ার্ড (TK)</label><input type="number" id="task-reward" class="form-input" placeholder="50"></div>
+                        <div class="form-group mb-0"><label class="form-label text-xs">লিংক (URL)</label><input type="text" id="task-link" class="form-input" placeholder="https://..."></div>
+                        <div class="form-group mb-0">
+                            <label class="form-label text-xs">টাস্কের ধরন</label>
+                            <select id="task-type" class="form-input text-white bg-[#0F172A]">
+                                <option value="telegram">Telegram (অ্যাডমিন ভেরিফাই)</option>
+                                <option value="custom">Custom (১৫ সেকেন্ড টাইমার)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addTask()" class="btn-primary mt-6"><i class="fas fa-plus mr-2"></i> টাস্ক অ্যাড করুন</button>
+                </div>
+
+                <div class="bg-[#1E293B] p-6 rounded-2xl border border-[#334155] shadow-lg">
+                    <h3 class="font-bold text-white mb-4">বর্তমান টাস্কসমূহ</h3>
+                    <div id="admin-tasks-list" class="space-y-3">
+                        <div class="text-center py-8 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> লোড হচ্ছে...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Task Verification View -->
+            <div id="task-verify-view" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 border-b border-[#334155] pb-4">পেন্ডিং টাস্ক ভেরিফিকেশন (Telegram)</h2>
+                <div class="bg-[#1E293B] rounded-2xl border border-[#334155] overflow-x-auto shadow-lg">
+                    <table class="clean-table">
+                        <thead class="bg-[#0F172A]">
+                            <tr>
+                                <th>ইউজার আইডি</th>
+                                <th>টাস্কের নাম</th>
+                                <th>রিওয়ার্ড</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-task-verify-list" class="text-sm">
+                             <tr><td colspan="4" class="text-center text-slate-500 py-8">লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. Withdraw View -->
+            <div id="withdraw-view" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6 border-b border-[#334155] pb-4">পেন্ডিং উইথড্র রিকোয়েস্ট</h2>
+                <div class="bg-[#1E293B] rounded-2xl border border-[#334155] overflow-x-auto shadow-lg">
+                    <table class="clean-table">
+                        <thead class="bg-[#0F172A]">
+                            <tr>
+                                <th>ইউজার নাম & আইডি</th>
+                                <th>নম্বর & মেথড</th>
+                                <th>রিকোয়েস্ট / কারেন্ট ব্যালেন্স</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-withdraw-list" class="text-sm">
+                             <tr><td colspan="4" class="text-center text-slate-500 py-8">লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 6. Users View (Detailed) -->
+            <div id="users-view" class="tab-content max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-[#334155] pb-4">
+                    <h2 class="text-2xl font-bold text-white">ইউজার ডেটাবেজ</h2>
+                    <button onclick="resetWeeklyLeaderboard()" class="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 px-5 py-2.5 rounded-xl font-bold hover:bg-[#F59E0B] hover:text-white transition flex items-center gap-2 shadow-lg">
+                        <i class="fas fa-trophy"></i> সাপ্তাহিক লিডারবোর্ড রিসেট
+                    </button>
+                </div>
+                
+                <div class="bg-[#1E293B] rounded-2xl border border-[#334155] overflow-x-auto shadow-lg">
+                    <table class="clean-table">
+                        <thead class="bg-[#0F172A]">
+                            <tr>
+                                <th>প্রোফাইল</th>
+                                <th>ব্যালেন্স & অ্যাক্টিভিটি</th>
+                                <th>রেফারেল তথ্য</th>
+                                <th class="text-right">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-list" class="text-sm">
+                             <tr><td colspan="4" class="text-center text-slate-500 py-8">ডেটা লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- UI Tab Logic -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId + '-view').classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    <!-- ================= FIREBASE ADMIN LOGIC (PART 2) ================= -->
+    <script>
+        // ১. ফায়ারবেস কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyAle4q_TRJoMeQc_LtusSI2s4FtXQyfha4",
+            authDomain: "flycashdemo.firebaseapp.com",
+            databaseURL: "https://flycashdemo-default-rtdb.firebaseio.com",
+            projectId: "flycashdemo",
+            storageBucket: "flycashdemo.firebasestorage.app",
+            messagingSenderId: "431352487997",
+            appId: "1:431352487997:web:2c12a04f751a97ed1c0a54"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        
+        // ২. অ্যাডমিন সিকিউরিটি (আপনার UID)
+        const ADMIN_UID = "XVTjNiO173ZRSdOX7X8X1ctekLg1"; 
+
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const errorMsg = document.getElementById('login-error');
+
+        // ================= AUTHENTICATION =================
+        auth.onAuthStateChanged((user) => {
+            if (user && user.uid === ADMIN_UID) {
+                loginScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+                loadDashboardData();
+            } else if (user) {
+                errorMsg.innerText = "অ্যাক্সেস ডিনাইড: আপনি অ্যাডমিন নন!";
+                errorMsg.classList.remove('hidden');
+                auth.signOut();
+            } else {
+                loginScreen.classList.remove('hidden');
+                dashboardScreen.classList.add('hidden');
+            }
+        });
+
+        function loginAdmin() {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const btn = document.getElementById('login-btn');
+
+            if(!email || !password) {
+                errorMsg.innerText = "ইমেইল এবং পাসওয়ার্ড দিন!";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            btn.innerText = "চেক করা হচ্ছে...";
+            btn.disabled = true;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .catch((error) => {
+                    errorMsg.innerText = "ভুল ইমেইল বা পাসওয়ার্ড!";
+                    errorMsg.classList.remove('hidden');
+                    btn.innerText = "Login to Dashboard";
+                    btn.disabled = false;
+                });
+        }
+
+        function logoutAdmin() { 
+            if(confirm('লগআউট করতে চান?')) auth.signOut(); 
+        }
+
+        // ================= DASHBOARD LOADERS =================
+        function loadDashboardData() {
+            // ১. সেটিংস লোড
+            db.ref('settings').on('value', (snapshot) => {
+                const s = snapshot.val() || {};
+                document.getElementById('set-bot-username').value = s.botUsername || '';
+                document.getElementById('set-support').value = s.supportLink || '';
+                document.getElementById('set-tutorial').value = s.tutorialVideo || '';
+                document.getElementById('set-ad-reward').value = s.adReward || '';
+                document.getElementById('set-ref-bonus').value = s.refBonus || '';
+                document.getElementById('set-gigapub').value = s.gigapubId || '';
+                document.getElementById('set-adsgram').value = s.adsgramId || '';
+                
+                // Box & Withdraw
+                document.getElementById('set-box-min').value = s.boxMin || '';
+                document.getElementById('set-box-max').value = s.boxMax || '';
+                document.getElementById('set-min-withdraw').value = s.minWithdraw || '';
+                document.getElementById('set-methods').value = s.withdrawMethods || '';
+                document.getElementById('set-withdraw-note').value = s.withdrawNote || '';
+
+                // Daily Bonus (1 to 7)
+                if(s.dailyRewards) {
+                    const days = s.dailyRewards.split(',');
+                    for(let i=0; i<7; i++) {
+                        document.getElementById(`db-${i+1}`).value = days[i] || '';
+                    }
+                }
+            });
+
+            // ২. টাস্ক লোড
+            db.ref('tasks').on('value', (snapshot) => {
+                const tasks = snapshot.val() || {};
+                const list = document.getElementById('admin-tasks-list');
+                list.innerHTML = '';
+                Object.keys(tasks).forEach(key => {
+                    const t = tasks[key];
+                    const typeBadge = t.type === 'telegram' ? 'bg-[#3B82F6]/20 text-[#3B82F6]' : 'bg-[#10B981]/20 text-[#10B981]';
+                    list.innerHTML += `
+                    <div class="bg-[#0F172A] border border-[#334155] p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-white">${t.title} <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md ml-2 border border-current ${typeBadge}">${t.type}</span></h4>
+                            <p class="text-sm text-slate-400 mt-1">রিওয়ার্ড: <span class="text-[#00E5FF] font-bold">TK ${t.reward}</span> | লিংক: <a href="${t.link}" target="_blank" class="underline">Visit</a></p>
+                        </div>
+                        <button onclick="deleteTask('${key}')" class="bg-red-500/10 text-red-500 border border-red-500/30 px-4 py-2 rounded-lg font-bold hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                });
+                if(list.innerHTML === '') list.innerHTML = '<p class="text-center py-6 text-slate-500">কোনো টাস্ক নেই</p>';
+            });
+
+            // ৩. টাস্ক ভেরিফিকেশন লোড
+            db.ref('task_verifications').orderByChild('status').equalTo('pending').on('value', async (snapshot) => {
+                const reqs = snapshot.val() || {};
+                const list = document.getElementById('admin-task-verify-list');
+                list.innerHTML = '';
+                
+                // Fetch Users to show names
+                const usersSnap = await db.ref('users').once('value');
+                const usersData = usersSnap.val() || {};
+
+                Object.keys(reqs).forEach(key => {
+                    const req = reqs[key];
+                    const userName = usersData[req.userId] ? usersData[req.userId].name : 'Unknown';
+                    list.innerHTML += `
+                    <tr class="border-b border-[#334155]">
+                        <td class="p-4 text-slate-300"><span class="font-bold text-white">${userName}</span><br><span class="text-xs">ID: ${req.userId}</span></td>
+                        <td class="p-4 text-white font-bold">${req.title}</td>
+                        <td class="p-4 text-[#00E5FF] font-bold">TK ${req.reward}</td>
+                        <td class="p-4 flex gap-2">
+                            <button onclick="approveTask('${key}', '${req.userId}', ${req.reward}, '${req.title}')" class="bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-emerald-500 hover:text-white transition">Approve</button>
+                            <button onclick="rejectTask('${key}')" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-500 hover:text-white transition">Reject</button>
+                        </td>
+                    </tr>`;
+                });
+                if(list.innerHTML === '') list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-500">কোনো পেন্ডিং টাস্ক ভেরিফিকেশন নেই</td></tr>';
+            });
+
+            // ৪. উইথড্র লোড
+            db.ref('withdraw_requests').orderByChild('status').equalTo('pending').on('value', async (snapshot) => {
+                const reqs = snapshot.val() || {};
+                const list = document.getElementById('admin-withdraw-list');
+                list.innerHTML = '';
+                
+                const usersSnap = await db.ref('users').once('value');
+                const usersData = usersSnap.val() || {};
+
+                Object.keys(reqs).forEach(key => {
+                    const req = reqs[key];
+                    const userBal = usersData[req.userId] ? usersData[req.userId].balance : 0;
+                    list.innerHTML += `
+                    <tr class="border-b border-[#334155] hover:bg-[#0F172A] transition">
+                        <td class="p-4">
+                            <p class="text-white font-bold">${req.name}</p>
+                            <p class="text-xs text-slate-400">ID: ${req.userId}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="font-mono text-white font-bold text-lg">${req.number}</p>
+                            <span class="text-xs bg-[#3B82F6]/20 text-[#3B82F6] px-2 py-0.5 rounded uppercase font-bold">${req.method}</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-white font-black text-lg">Req: TK ${req.amount}</span><br>
+                            <span class="text-xs text-amber-400 font-bold">Bal: TK ${parseFloat(userBal).toFixed(2)}</span>
+                        </td>
+                        <td class="p-4 flex gap-2">
+                            <button onclick="approveWithdraw('${key}', '${req.userId}', ${req.amount})" class="bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-emerald-500 hover:text-white transition"><i class="fas fa-check"></i></button>
+                            <button onclick="rejectWithdraw('${key}', '${req.userId}', ${req.amount})" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                if(list.innerHTML === '') list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-slate-500">কোনো পেন্ডিং রিকোয়েস্ট নেই</td></tr>';
+            });
+
+            // ৫. বিস্তারিত ইউজার লোড
+            db.ref('users').on('value', (snapshot) => {
+                const users = snapshot.val() || {};
+                const list = document.getElementById('admin-users-list');
+                list.innerHTML = '';
+                
+                Object.keys(users).reverse().forEach(key => {
+                    const u = users[key];
+                    const avatar = u.photoUrl || `https://ui-avatars.com/api/?name=${u.name || 'User'}&background=0F172A&color=3B82F6&bold=true`;
+                    const statusBadge = u.status === 'banned' ? '<span class="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded ml-2">BANNED</span>' : '';
+                    const referredBy = u.referredBy && u.referredBy !== 'None' ? u.referredBy : 'No Ref';
+
+                    list.innerHTML += `
+                    <tr class="border-b border-[#334155] hover:bg-[#0F172A] transition">
+                        <td class="p-4 flex items-center gap-3">
+                            <img src="${avatar}" class="w-12 h-12 rounded-full border-2 border-[#3B82F6] object-cover">
+                            <div>
+                                <p class="text-white font-bold">${u.name || 'Unknown'} ${statusBadge}</p>
+                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">${key}</p>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-[#00E5FF] font-black text-lg">TK ${parseFloat(u.balance || 0).toFixed(2)}</p>
+                            <p class="text-xs text-slate-400 font-semibold"><i class="fas fa-video text-[#3B82F6]"></i> Ads: ${u.adsWatched || 0}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-white font-bold"><i class="fas fa-users text-[#F59E0B]"></i> Total: ${u.totalRefs || 0}</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Invited By: <span class="text-slate-300">${referredBy}</span></p>
+                        </td>
+                        <td class="p-4 text-right flex justify-end gap-2">
+                            <button onclick="editBalance('${key}', '${u.name || 'User'}')" class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-500 hover:text-white transition"><i class="fas fa-pen"></i></button>
+                            <button onclick="banUser('${key}', '${u.status}')" class="${u.status === 'banned' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30 hover:bg-emerald-500' : 'bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500'} border px-3 py-1.5 rounded-lg text-xs font-bold hover:text-white transition">
+                                <i class="fas ${u.status === 'banned' ? 'fa-unlock' : 'fa-lock'}"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            });
+        }
+
+        // ================= ACTIONS (Save, Add, Delete, Verify) =================
+        function saveSettings() {
+            const dailyRewards = [];
+            for(let i=1; i<=7; i++) dailyRewards.push(document.getElementById(`db-${i}`).value || 0);
+
+            const btn = event.target;
+            btn.innerText = "Saving...";
+
+            db.ref('settings').update({
+                botUsername: document.getElementById('set-bot-username').value,
+                supportLink: document.getElementById('set-support').value,
+                tutorialVideo: document.getElementById('set-tutorial').value,
+                adReward: document.getElementById('set-ad-reward').value,
+                refBonus: document.getElementById('set-ref-bonus').value,
+                gigapubId: document.getElementById('set-gigapub').value,
+                adsgramId: document.getElementById('set-adsgram').value,
+                boxMin: document.getElementById('set-box-min').value,
+                boxMax: document.getElementById('set-box-max').value,
+                minWithdraw: document.getElementById('set-min-withdraw').value,
+                withdrawMethods: document.getElementById('set-methods').value,
+                withdrawNote: document.getElementById('set-withdraw-note').value,
+                dailyRewards: dailyRewards.join(',')
+            }).then(() => {
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i> সেভ হয়েছে!';
+                setTimeout(() => btn.innerHTML = '<i class="fas fa-save mr-2"></i> সব সেটিংস সেভ করুন', 2000);
+            });
+        }
+
+        function sendNotification() {
+            const msg = document.getElementById('global-notification').value;
+            if(!msg) return alert('মেসেজ লিখুন');
+            
+            db.ref('settings/notification').set(msg).then(() => {
+                alert('নোটিফিকেশন সফলভাবে পাঠানো হয়েছে!');
+                document.getElementById('global-notification').value = '';
+            });
+        }
+
+        function addTask() {
+            const title = document.getElementById('task-title').value;
+            const reward = document.getElementById('task-reward').value;
+            const link = document.getElementById('task-link').value;
+            const type = document.getElementById('task-type').value;
+
+            if(!title || !reward || !link) return alert('সবগুলো ঘর পূরণ করুন!');
+
+            db.ref('tasks').push({
+                title: title, reward: parseFloat(reward), link: link, type: type, active: true
+            }).then(() => {
+                document.getElementById('task-title').value = '';
+                document.getElementById('task-reward').value = '';
+                document.getElementById('task-link').value = '';
+                alert('টাস্ক অ্যাড হয়েছে!');
+            });
+        }
+
+        function deleteTask(taskId) {
+            if(confirm('টাস্কটি ডিলিট করতে চান?')) db.ref('tasks/' + taskId).remove();
+        }
+
+        function approveTask(reqId, userId, reward, title) {
+            db.ref('users/' + userId + '/balance').once('value').then(snap => {
+                const bal = snap.val() || 0;
+                db.ref('users/' + userId + '/balance').set(bal + reward).then(() => {
+                    db.ref('task_verifications/' + reqId).update({ status: 'approved' });
+                    db.ref(`history/${userId}/transactions`).push({
+                        title: `ভেরিফাইড: ${title}`, amount: reward, timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                });
+            });
+        }
+
+        function rejectTask(reqId) {
+            if(confirm('টাস্কটি রিজেক্ট করতে চান?')) db.ref('task_verifications/' + reqId).update({ status: 'rejected' });
+        }
+
+        function approveWithdraw(reqId, userId, amount) {
+            if(confirm('রিকোয়েস্টটি অ্যাপ্রুভ করতে চান?')) {
+                db.ref('withdraw_requests/' + reqId).update({ status: 'approved' });
+                db.ref(`history/${userId}/withdrawals`).orderByChild('timestamp').limitToLast(1).once('value', snap => {
+                    snap.forEach(child => {
+                        db.ref(`history/${userId}/withdrawals/${child.key}`).update({ status: 'approved' });
+                    });
+                });
+            }
+        }
+
+        function rejectWithdraw(reqId, userId, amount) {
+            if(confirm('রিজেক্ট করে ইউজারের ব্যালেন্সে টাকা ফেরত দিতে চান?')) {
+                db.ref('users/' + userId + '/balance').once('value').then(snap => {
+                    const currentBal = snap.val() || 0;
+                    db.ref('users/' + userId + '/balance').set(currentBal + amount).then(() => {
+                        db.ref('withdraw_requests/' + reqId).update({ status: 'rejected' });
+                        db.ref(`history/${userId}/transactions`).push({
+                            title: "উইথড্র বাতিল (রিফান্ড)", amount: amount, timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    });
+                });
+            }
+        }
+
+        function editBalance(userId, name) {
+            const amount = prompt(`${name} এর ব্যালেন্সে কত টাকা অ্যাড বা মাইনাস করবেন? (মাইনাস করতে আগে - দিন, উদা: -50)`);
+            if(amount && !isNaN(amount)) {
+                db.ref('users/' + userId + '/balance').once('value').then(snap => {
+                    const currentBal = snap.val() || 0;
+                    db.ref('users/' + userId + '/balance').set(currentBal + parseFloat(amount)).then(() => {
+                        db.ref(`history/${userId}/transactions`).push({
+                            title: "অ্যাডমিন ব্যালেন্স আপডেট", amount: parseFloat(amount), timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    });
+                });
+            }
+        }
+
+        function banUser(userId, currentStatus) {
+            const newStatus = currentStatus === 'banned' ? 'active' : 'banned';
+            if(confirm(`এই ইউজারকে ${newStatus === 'banned' ? 'ব্যান' : 'আনব্যান'} করতে চান?`)) {
+                db.ref('users/' + userId + '/status').set(newStatus);
+            }
+        }
+
+        function resetWeeklyLeaderboard() {
+            if(confirm('সাপ্তাহিক লিডারবোর্ড রিসেট করতে চান? (সব ইউজারের অ্যাড ও রেফার কাউন্ট 0 হয়ে যাবে, কিন্তু মেইন ব্যালেন্স ঠিক থাকবে)')) {
+                db.ref('users').once('value').then(snap => {
+                    const updates = {};
+                    snap.forEach(child => {
+                        updates[child.key + '/adsWatched'] = 0;
+                        updates[child.key + '/totalRefs'] = 0;
+                    });
+                    db.ref('users').update(updates).then(() => alert('লিডারবোর্ড সফলভাবে রিসেট সম্পন্ন হয়েছে!'));
+                });
+            }
+        }
+    </script>
+  
+  
+</body>
+</html>
