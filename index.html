@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fly Cash 🚀 টাকা উড়াও 💸</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase SDK (Compat Version for Blogger) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Ad Networks -->
+    <script src="https://ad.gigapub.tech/script?id=" id="gigapub-script"></script>
+  
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0A192F;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        /* Tab Navigation Logic */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-button {
+            display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+            color: #94a3b8; font-size: 0.7rem; font-weight: 600; transition: all 0.3s ease; cursor: pointer;
+        }
+        .nav-button.active { color: #00E5FF; }
+        .nav-button.active svg { color: #00E5FF; transform: translateY(-2px); }
+        .nav-button svg { width: 1.5rem; height: 1.5rem; transition: all 0.3s ease; }
+        
+        .stat-icon { width: 2rem; height: 2rem; color: #00E5FF; }
+        .stat-card {
+            background: #112240; border: 1px solid #233554; border-radius: 1rem; padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); transition: all 0.3s ease;
+        }
+        .stat-card:hover { border-color: #00E5FF; box-shadow: 0 4px 12px rgba(0, 229, 255, 0.2); transform: translateY(-2px); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A192F; }
+        ::-webkit-scrollbar-thumb { background: #233554; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00E5FF; }
+
+        /* Task Page Styles */
+        .task-card {
+            background: #112240; border: 1px solid #233554; border-radius: 1.5rem; padding: 1.25rem;
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; transition: all 0.3s ease;
+        }
+        .task-card:hover { box-shadow: 0 4px 12px rgba(0, 229, 255, 0.1); border-color: #00E5FF; }
+        .task-icon {
+            width: 3.5rem; height: 3.5rem; border-radius: 1rem; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; background: #0A192F; color: #00E5FF; border: 1px solid #233554;
+        }
+        .task-button {
+            padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.3s ease; border: none; white-space: nowrap; flex-shrink: 0;
+        }
+        .task-button.blue { background-color: #00E5FF; color: #0A192F; }
+        .task-button.blue-outline { background-color: transparent; color: #00E5FF; border: 1.5px solid #00E5FF; }
+        
+        .featured-task-card {
+            background: linear-gradient(135deg, #112240 0%, #0A192F 100%); border: 2px solid #233554;
+            border-radius: 1.5rem; padding: 1.25rem 1.5rem; display: flex; flex-direction: column;
+            align-items: center; text-align: center; gap: 1rem; margin-bottom: 1.25rem;
+            box-shadow: 0 8px 20px -6px rgba(0, 229, 255, 0.15);
+        }
+        .featured-task-button {
+            background: #00E5FF; color: #0A192F; padding: 0.75rem 1.75rem; border-radius: 0.875rem;
+            font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; width: 100%; max-width: 220px;
+        }
+
+        /* Support Page Styles */
+        .tutorial-card { background: #00E5FF; border-radius: 1.2rem; padding: 2rem; text-align:center; color: #0A192F; }
+        .tutorial-button {
+            display:inline-block; background:#0A192F; color:#00E5FF; font-weight:800;
+            padding:.9rem 1.6rem; border-radius:.8rem; margin-top: 1rem;
+        }
+
+        /* Loader */
+        #loading-screen {
+            position: fixed; inset: 0; background: radial-gradient(circle at center, #112240 0%, #0A192F 100%);
+            z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s;
+        }
+        #loading-screen.hidden { opacity: 0; visibility: hidden; }
+        .dashed-circle {
+            position: absolute; inset: -10px; border: 2px dashed #00E5FF; border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } 
+      
+    /* Wallet Menu & Modal Styles */
+    .menu-card-wide { background: #00E5FF; border-radius: 1.5rem; padding: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0, 229, 255, 0.3); color: #0A192F; }
+    .menu-card-wide:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.3); }
+    .menu-item-list { background: #112240; border: 1px solid #233554; border-radius: 1.25rem; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .menu-item-list:hover { background: #1a2c4e; border-color: #00E5FF; transform: translateX(4px); }
+    .menu-item-list.red { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+    .menu-icon-circle { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #0A192F; color: #00E5FF; border: 1px solid #233554; }
+    .menu-item-list.red .menu-icon-circle { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+    .modal.active { display: flex; }
+    .modal-content { background: #112240; border: 2px solid #233554; border-radius: 2rem; padding: 2rem; width: 100%; max-width: 450px; max-height: 85vh; overflow-y: auto; animation: modalPop 0.3s ease-out; color: white; }
+    @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.5rem; }
+    .form-input, .form-select { width: 100%; padding: 0.875rem 1.125rem; border: 1px solid #233554; border-radius: 0.75rem; font-size: 1rem; background: #0A192F; color: white; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: #00E5FF; background: #112240; }
+    .button-primary { background: #00E5FF; color: #0A192F; padding: 0.875rem 1.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-weight: 600; width: 100%; }
+    .button-secondary { background-color: #233554; color: #ffffff; padding: 0.875rem 1.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-weight: 600; width: 100%; }
+    .button-group { display: flex; gap: 1rem; margin-top: 2rem; }
+      
+     .setup-container { padding: 2rem 1rem; min-height: calc(100vh - 160px); display: flex; flex-direction: column; justify-content: center; }
+    .setup-card { background: #112240; border: 1px solid #233554; border-radius: 2rem; padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .setup-icon { width: 4rem; height: 4rem; background: #0A192F; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #00E5FF; border: 1px solid #233554; }
+    .submit-btn { width: 100%; background: #00E5FF; color: #0A192F; padding: 1rem; border-radius: 1rem; font-weight: 800; font-size: 1rem; margin-top: 1rem; box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2); transition: all 0.3s ease; border: none;}
+    .submit-btn:active { transform: scale(0.98); }
+  
+  </style>
+</head>
+<body class="bg-[#0A192F] text-white selection:bg-[#00E5FF]/30">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="relative w-[120px] h-[120px] mb-10">
+            <div class="dashed-circle"></div>
+            <div class="w-full h-full bg-gradient-to-br from-[#0A192F] to-[#00E5FF] rounded-full flex items-center justify-center shadow-lg relative z-10">
+                <svg fill="currentColor" viewBox="0 0 24 24" class="w-[60px] h-[60px] text-white">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.82v-1.91c-.39-.05-.77-.13-1.14-.24l-.19-.06-1.12.83-1.66-1.66.83-1.12-.06-.19c-.15-.46-.24-.94-.27-1.44H5.18v-2.35h1.91c.05-.39.13-.77.24-1.14l.06-.19-.83-1.12 1.66-1.66 1.12.83.19-.06c.46-.15.94-.24 1.44-.27V5.18h2.35v1.91c.39.05.77.13 1.14.24l.19.06 1.12-.83 1.66 1.66-.83 1.12.06.19c.15.46.24.94.27 1.44h1.91v2.35h-1.91c-.05.39-.13.77-.24 1.14l-.06.19.83 1.12-1.66 1.66-1.12-.83-.19.06c-.46.15-.94.24-1.44.27zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-4xl font-black text-[#00E5FF] mb-2">Fly Cash</h1>
+        <p class="text-sm font-bold text-[#94a3b8] tracking-widest uppercase">ডেটা লোড হচ্ছে...</p>
+    </div>
+
+    <div class="min-h-screen pb-24 relative">
+        <!-- Sticky Header -->
+        <div class="sticky top-0 z-40 bg-[#112240]/80 backdrop-blur-md border-b border-[#233554] px-4 py-3">
+            <h1 class="text-2xl font-bold text-[#00E5FF] text-center tracking-tight">Fly Cash 🚀 টাকা উড়াও 💸 ✓</h1>
+        </div>
+
+                <!-- ================= HOME VIEW ================= -->
+        <div id="home-view" class="tab-content active">
+            
+            <!-- User Profile Section -->
+            <div class="px-4 py-6 bg-[#112240] border-b border-[#233554]">
+                <div class="flex items-center gap-4">
+                    <!-- Avatar -->
+                    <div class="w-16 h-16 rounded-full border-4 border-[#00E5FF] bg-gradient-to-br from-[#0A192F] to-[#00E5FF] flex items-center justify-center text-white font-bold text-xl flex-shrink-0 shadow-lg cursor-pointer overflow-hidden">
+                         <span id="ui-user-initial">U</span> <!-- Dynamic Initial Here -->
+                    </div>
+
+                    <!-- User Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h2 id="ui-user-name" class="text-xl font-bold text-white">Loading...</h2> <!-- Dynamic Name Here -->
+                            <span class="text-[#00E5FF]">✓</span>
+                        </div>
+                    </div>
+
+                         <!-- Notification Bell -->
+                    <button onclick="openNotificationModal()" class="p-3 hover:bg-[#0A192F] rounded-full transition-colors relative">
+                        <svg class="w-6 h-6 text-[#00E5FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span id="notification-badge" class="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full hidden"></span>
+                    </button>
+              
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="px-4 py-6">
+                <div class="bg-[#00E5FF] rounded-3xl p-8 text-[#0A192F] shadow-xl shadow-[#00E5FF]/20">
+                    <p class="text-sm font-bold opacity-80 tracking-wide uppercase">মোট ব্যালেন্স</p>
+                    <h3 class="text-5xl font-black mt-4">TK <span id="ui-main-balance">0.00</span></h3> <!-- Dynamic Balance Here -->
+                </div>
+            </div>
+
+            <!-- Activity Feed (Live Withdrawal Ticker) -->
+            <div class="px-4 py-4">
+                <div class="bg-[#112240] rounded-2xl p-4 border border-[#233554] overflow-hidden relative h-16 flex items-center shadow-sm">
+                    <div id="live-withdrawal-container" class="whitespace-nowrap absolute will-change-transform">
+                        <!-- Javascript will populate this -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="px-4 py-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Total Tasks -->
+                    <div class="stat-card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="text-sm text-slate-400 font-bold">মোট টাস্ক</span>
+                        </div>
+                        <p id="ui-total-tasks" class="text-2xl font-black text-white">0</p> <!-- Dynamic Tasks Here -->
+                    </div>
+
+                    <!-- Total Referrals -->
+                    <div class="stat-card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a9 9 0 0118 0v2H6v-2z"></path>
+                            </svg>
+                            <span class="text-sm text-slate-400 font-bold">মোট রেফার</span>
+                        </div>
+                        <p id="ui-total-refs" class="text-2xl font-black text-white">0</p> <!-- Dynamic Refs Here -->
+                    </div>
+
+                    <!-- Ads Watched -->
+                    <div class="stat-card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="text-sm text-slate-400 font-bold">অ্যাড দেখা হয়েছে</span>
+                        </div>
+                        <p id="ui-total-ads" class="text-2xl font-black text-white">0</p> <!-- Dynamic Ads Here -->
+                    </div>
+
+                    <!-- Bonus Balance -->
+                    <div class="stat-card">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm text-slate-400 font-bold">বোনাস ব্যালেন্স</span>
+                        </div>
+                        <p class="text-2xl font-black text-white">TK <span id="ui-bonus-balance">0.00</span></p> <!-- Dynamic Bonus Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Check-in Section -->
+            <div class="px-4 py-6">
+                <div class="bg-[#112240] rounded-3xl p-6 border border-[#233554] shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-black text-white mb-1">Daily Bonus</h2>
+                            <div class="flex items-center justify-center gap-2 text-[#00E5FF] font-bold">
+                                <span>🎁 দৈনিক বোনাস</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-2">প্রতিদিন বোনাস সংগ্রহ করুন ➡️ Claim your bonus every day</p>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-4 px-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">📅</span>
+                                <span class="text-sm font-bold text-white">Progress</span>
+                            </div>
+                            <div class="bg-[#00E5FF]/10 text-[#00E5FF] px-4 py-1 rounded-xl border border-[#00E5FF]/20 text-xs font-black">
+                                <span id="ui-daily-progress">1</span>/7 দিন <!-- Dynamic Progress Here -->
+                            </div>
+                        </div>
+
+                        <!-- 7 Days Grid -->
+                        <div class="grid grid-cols-4 gap-3 mb-8" id="daily-bonus-grid">
+                           <!-- Javascript will generate the grid here to make it dynamic -->
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="p-4 bg-[#233554]/30 rounded-2xl border border-[#233554]" id="bonus-status-claimed" style="display: none;">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-lg">✅</span>
+                                    <span class="text-sm font-bold text-white">Status</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+                                    <span>✔️ আজকের বোনাস সংগ্রহ করা হয়েছে</span>
+                                </div>
+                            </div>
+
+                            <button onclick="claimFirebaseDailyBonus()" id="claimCheckinBtn" class="w-full bg-[#00E5FF] text-[#0A192F] py-4 rounded-2xl font-black text-sm shadow-xl shadow-[#00E5FF]/30 hover:scale-[0.98] transition-transform active:scale-95">
+                                এখনই ক্লেইম করুন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mystery Box Section -->
+            <div class="px-4 py-6">
+                <div class="bg-[#112240] rounded-3xl p-6 border border-[#233554] shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+                    
+                    <div class="relative z-10 text-center">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="text-left">
+                                <h2 class="text-xl font-black text-white">মিষ্টি বক্স 🎁</h2>
+                                <p class="text-xs text-slate-400 mt-1">বক্স খুলতে অ্যাড দেখুন</p>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <div class="bg-[#00E5FF]/10 text-[#00E5FF] px-4 py-2 rounded-2xl border border-[#00E5FF]/20 text-xs font-black">
+                                    আজকের অ্যাড: <span id="ui-box-ad-count">0</span>/3
+                                </div>
+                                <div class="bg-[#10B981]/10 text-[#10B981] px-4 py-2 rounded-2xl border border-[#10B981]/20 text-xs font-black">
+                                    বক্স খোলা: <span id="ui-box-opened">0</span>/5
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="box-animation-area" class="py-10 flex flex-col items-center justify-center min-h-[200px]">
+                            <div id="mystery-box-graphic" class="relative cursor-pointer transition-transform hover:scale-105 active:scale-95">
+                                <div class="text-7xl mb-4">🎁</div>
+                                <div class="absolute inset-0 bg-[#00E5FF]/20 blur-2xl rounded-full -z-10 animate-pulse"></div>
+                            </div>
+                            
+                            <div class="w-full max-w-[250px] mt-6">
+                                <div class="flex justify-between text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+                                    <span>অ্যাড প্রগ্রেস</span>
+                                    <span class="text-[#00E5FF]"><span id="ui-box-progress-text">0</span>/3</span>
+                                </div>
+                                <div class="w-full bg-[#0A192F] rounded-full h-3 border border-[#233554] overflow-hidden">
+                                    <div id="box-progress-fill" class="bg-gradient-to-r from-[#00E5FF] to-[#0A192F] h-full transition-all duration-500" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <button onclick="watchMysteryBoxAd(this)" id="mysteryAdBtn" class="mt-8 w-full bg-[#233554] text-white py-4 rounded-2xl font-black text-sm border border-[#00E5FF]/30 hover:bg-[#2a4066]">
+                                অ্যাড দেখুন (১ম অ্যাড)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Leaderboard Button Section -->
+            <div class="px-4 py-6 mb-8">
+                <a href="javascript:void(0)" onclick="switchTab('leaderboard')" class="block">
+                    <div class="bg-gradient-to-r from-[#112240] to-[#1d3557] rounded-3xl p-6 border border-[#233554] shadow-xl hover:border-[#00E5FF] transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-[#00E5FF]/10 rounded-2xl flex items-center justify-center text-[#00E5FF] group-hover:scale-110 transition-transform">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a.75.75 0 00-1.336 0l-4.243 8.486a.75.75 0 00.188.882L10.5 18.332V21a.75.75 0 001.5 0v-2.668l8.056-4.267a.75.75 0 00.188-.882l-4.243-8.486a.75.75 0 00-1.336 0L12 10.364l-2.165-5.667z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-black text-white">লিডারবোর্ড 🏆</h2>
+                                    <p class="text-xs text-slate-400 mt-1">সেরা ইনকামারদের তালিকা দেখুন</p>
+                                </div>
+                            </div>
+                            <div class="text-[#00E5FF]">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+           
+        </div>
+
+                <!-- ================= TASKS VIEW ================= -->
+        <div id="tasks-view" class="tab-content">
+            <div class="px-4 py-6">
+                <!-- Featured Watch Video Task (Always visible) -->
+                <div class="featured-task-card">
+                    <div class="featured-task-icon">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                        </svg>
+                    </div>
+                    <div class="featured-task-content">
+                        <h3>অ্যাড দেখুন</h3>
+                        <p class="mb-3 text-slate-400">প্রতিটি অ্যাড দেখলে TK <span id="ui-ad-reward">0.00</span> ইনকাম করুন</p>
+                        <div class="inline-block bg-[#00E5FF]/10 px-4 py-1 rounded-full border border-[#00E5FF]/20 shadow-sm">
+                            <span class="text-base font-bold text-[#00E5FF]">💵 রিওয়ার্ড: TK <span id="ui-ad-reward-pill">0.00</span></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Daily Ad Limit Progress -->
+                    <div class="w-full max-w-[300px] mt-4 mb-2">
+                        <div class="flex justify-between text-sm font-bold text-slate-300 mb-1">
+                            <span>আজকের কাজ সম্পন্ন</span>
+                            <span><span id="ui-daily-ads-watched">0</span> / 15</span>
+                        </div>
+                        <div class="w-full bg-[#0A192F] rounded-full h-3 overflow-hidden border border-[#233554]">
+                            <div id="ui-daily-ads-progress" class="bg-gradient-to-r from-[#00E5FF] to-[#0A192F] h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="featured-task-button" id="watchAdBtn" onclick="watchTaskAd()">অ্যাড দেখুন</button>
+                </div>
+
+                <!-- Dynamic Telegram & Social Tasks -->
+                <h3 class="font-bold text-white mt-8 mb-4">অন্যান্য টাস্কসমূহ</h3>
+                <div id="dynamic-tasks-container">
+                    <!-- Javascript will populate tasks here from Firebase -->
+                    <p class="text-slate-400 text-center text-sm py-4">লোড হচ্ছে...</p>
+                </div>
+            </div>
+        </div>
+      
+        <!-- ================= LEADERBOARD VIEW ================= -->
+        <div id="leaderboard-view" class="tab-content">
+            <div class="px-4 py-6 max-md mx-auto">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">সাপ্তাহিক লিডারবোর্ড</h2>
+                    <p class="text-sm text-slate-400">সাপ্তাহিক সেরা পারফর্মারদের তালিকা</p>
+                </div>
+
+                <div class="bg-[#112240] rounded-xl p-4 border border-[#233554] text-center mb-6">
+                    <p class="text-[#00E5FF] font-bold text-sm">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        রিসেট হবে: <span id="leaderboard-timer">3d 7h 40m পর</span>
+                    </p>
+                </div>
+
+                <div class="flex gap-2 mb-6">
+                    <button onclick="switchLeaderboardTab('ads')" id="lb-tab-ads" class="flex-1 bg-[#00E5FF] text-[#0A192F] py-3 rounded-xl font-bold text-sm transition">অ্যাড দেখা</button>
+                    <button onclick="switchLeaderboardTab('refs')" id="lb-tab-refs" class="flex-1 bg-[#112240] text-slate-400 py-3 rounded-xl font-bold text-sm border border-[#233554] transition">রেফারেল</button>
+                </div>
+
+                <div class="bg-gradient-to-r from-[#00E5FF] to-[#0A192F] rounded-2xl p-4 mb-6 flex items-center justify-between border border-[#00E5FF]">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-[#0A192F] rounded-full flex items-center justify-center font-bold text-white border-2 border-white">
+                            #<span id="ui-my-rank">N/A</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-[#0A192F] font-bold opacity-80">আপনার র‍্যাংক (<span id="ui-rank-type">অ্যাড</span>)</p>
+                            <p class="font-bold text-white text-lg" id="ui-rank-name">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-[#0A192F] text-lg"><span id="ui-my-score">0</span></p>
+                    </div>
+                </div>
+
+                <div id="dynamic-leaderboard-list" class="space-y-3">
+                    <!-- JS will load top users here -->
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= SUPPORT VIEW ================= -->
+        <div id="support-view" class="tab-content">
+            <div class="px-4 py-6 space-y-6">
+                <h2 class="text-xl font-bold text-white">কাজের ভিডিও / টিউটোরিয়াল</h2>
+                <div class="tutorial-card">
+                    <h3 class="text-xl font-bold mb-2">কিভাবে কাজ করবেন?</h3>
+                    <p class="text-sm font-semibold opacity-90">কাজ শুরু করার আগে এই ভিডিওটি দেখে নিন।</p>
+                    <a href="#" id="ui-tutorial-link" target="_blank" class="tutorial-button">📺 ভিডিও দেখুন</a>
+                </div>
+
+                <h2 class="text-xl font-bold text-white mt-8">সহায়তা প্রয়োজন?</h2>
+                <a href="#" id="ui-support-link" target="_blank" class="block w-full">
+                    <div class="bg-gradient-to-br from-[#112240] to-[#0A192F] rounded-2xl shadow-lg border border-[#233554] p-6 text-center">
+                        <div class="w-16 h-16 bg-[#00E5FF]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#00E5FF]/20 text-[#00E5FF]">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0z"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2 text-white">কাস্টমার সাপোর্ট</h3>
+                        <p class="text-slate-400 mb-4">যেকোনো সমস্যার সমাধানের জন্য আমাদের সাথে যোগাযোগ করুন</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ================= REFERRAL VIEW ================= -->
+        <div id="referral-view" class="tab-content">
+            <div class="px-4 py-6 max-md mx-auto">
+                <!-- Main Referral Card -->
+                <div class="bg-[#112240] rounded-2xl p-6 border border-[#233554] shadow-xl relative overflow-hidden">
+                    <!-- Glow Effect -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF]/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-[#00E5FF]/10 blur-3xl rounded-full -ml-10 -mb-10"></div>
+
+                    <!-- Header -->
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-6 h-6 text-[#00E5FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+                            </svg>
+                            <h2 class="text-lg font-bold text-white">বন্ধুদের রেফার করুন এবং ইনকাম করুন</h2>
+                        </div>
+
+                        <p class="text-slate-400 text-sm mb-5 leading-relaxed">
+                            আপনার রেফারেল লিংক শেয়ার করুন এবং বন্ধুদের আমন্ত্রণ জানান। যখন আপনার বন্ধু সাইন আপ করবে, আপনি পাবেন <span class="text-[#00E5FF] font-bold"><span id="ui-ref-bonus-text">100.00</span> টাকা</span> বোনাস।
+                        </p>
+
+                        <!-- Bonus Pill -->
+                        <div class="bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-full py-2 px-4 inline-flex items-center gap-2 mb-6">
+                            <svg class="w-4 h-4 text-[#00E5FF]" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-[#00E5FF] text-xs font-bold">প্রতি রেফারে বোনাস <span id="ui-ref-bonus-pill">100.00</span> টাকা</span>
+                        </div>
+
+                        <!-- Link Box -->
+                        <div class="bg-[#0A192F] border border-[#233554] rounded-xl p-2 flex items-center gap-2 mb-6">
+                            <input type="text" value="Loading..." readonly id="refLinkInput"
+                                   class="bg-transparent text-slate-400 text-xs w-full px-2 focus:outline-none font-mono">
+                            <button onclick="copyRefLink()" class="w-8 h-8 flex items-center justify-center bg-[#00E5FF] rounded-lg text-[#0A192F] hover:opacity-90 transition-opacity">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="copyRefLink()" class="bg-[#00E5FF] text-[#0A192F] py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                লিংক কপি
+                            </button>
+                            <button onclick="shareRefLink()" class="bg-[#233554] text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-black/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                </svg>
+                                শেয়ার করুন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referrals List Section -->
+                <div class="mt-8">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="text-white font-bold text-lg">রেফার করা বন্ধুদের তালিকা</h3>
+                        <div class="bg-[#00E5FF]/10 text-[#00E5FF] px-3 py-1 rounded-lg text-xs font-bold border border-[#00E5FF]/20">
+                            মোট: <span id="ui-referral-list-count">0</span>
+                        </div>
+                    </div>
+
+                    <div id="dynamic-referrals-container" class="space-y-3">
+                        <div class="text-center py-10 bg-[#112240] rounded-xl border border-[#233554] border-dashed">
+                            <div class="w-12 h-12 bg-[#0A192F] rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-slate-400 text-sm">এখনো কোনো বন্ধু নেই</p>
+                            <p class="text-slate-500 text-xs mt-1">লিংকটি শেয়ার করুন এবং ইনকাম শুরু করুন!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <!-- ================= WALLET VIEW ================= -->
+        <div id="wallet-view" class="tab-content">
+            <!-- User Profile Section -->
+            <div class="px-4 py-6 bg-[#112240] border-b border-[#233554] flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full border-4 border-[#00E5FF] bg-gradient-to-br from-[#0A192F] to-[#00E5FF] flex items-center justify-center font-bold text-xl shadow-lg">
+                    <span id="ui-wallet-initial">U</span>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span id="ui-wallet-name">Loading...</span> <span class="text-[#00E5FF]">✓</span>
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="px-4 py-6">
+                <div class="bg-gradient-to-br from-[#6366f1] to-[#a855f7] rounded-3xl p-8 text-white shadow-lg">
+                    <p class="text-sm font-medium opacity-90 tracking-wide">মোট ব্যালেন্স</p>
+                    <h3 class="text-5xl font-bold mt-4">TK <span id="ui-wallet-balance">0.00</span></h3>
+                </div>
+            </div>
+
+            <!-- Menu Section -->
+            <div class="px-4 py-6 space-y-4">
+                <div class="menu-card-wide" onclick="openWithdrawalModal()">
+                    <svg class="w-8 h-8 text-[#0A192F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="font-bold text-[#0A192F] text-lg">এখনই উইথড্র করুন</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="menu-item-list" onclick="openTransactionModal()">
+                        <div class="menu-icon-circle"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+                        <div class="flex-1"><p class="font-bold text-white">ট্রানজেকশন হিস্ট্রি</p><p class="text-xs text-slate-400">আপনার সব ইনকাম রেকর্ড দেখুন</p></div>
+                    </div>
+                    
+                    <div class="menu-item-list" onclick="openWithdrawalHistoryModal()">
+                        <div class="menu-icon-circle"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18 10 11.41l4 4 6.3-6.29L23 12v-6z"/></svg></div>
+                        <div class="flex-1"><p class="font-bold text-white">উইথড্র হিস্ট্রি</p><p class="text-xs text-slate-400">আপনার উইথড্র রেকর্ড দেখুন</p></div>
+                    </div>
+
+                    <div class="menu-item-list" onclick="switchTab('support')">
+                        <div class="menu-icon-circle"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+                        <div class="flex-1"><p class="font-bold text-white">সাপোর্ট</p><p class="text-xs text-slate-400">আমাদের সাথে যোগাযোগ করুন</p></div>
+                    </div>
+
+                    <div class="menu-item-list red" onclick="logoutApp()">
+                        <div class="menu-icon-circle"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div>
+                        <div class="flex-1"><p class="font-bold text-red-500">লগআউট</p><p class="text-xs text-red-400/60">অ্যাকাউন্ট থেকে বের হয়ে যান</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modals -->
+            <!-- Withdrawal Modal -->
+            <div id="withdrawalModal" class="modal">
+                <div class="modal-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">উইথড্র করুন</h2>
+                        <button onclick="closeWithdrawalModal()" class="p-2 hover:bg-[#233554] rounded-lg">❌</button>
+                    </div>
+                    <div class="bg-blue-900/30 border border-blue-700/50 rounded-xl p-4 mb-4">
+                        <p class="text-sm font-bold text-blue-300 mb-2">⚠️ অ্যাড দেখার শর্ত</p>
+                        <p class="text-sm text-blue-200">উইথড্র করার জন্য আপনাকে অন্তত 20টি অ্যাড দেখতে হবে। বর্তমানে আপনি দেখেছেন: <span class="font-bold text-white" id="ui-withdraw-ads-watched">0</span>/20।</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">পেমেন্ট মেথড</label>
+                        <select id="paymentMethod" class="form-select">
+                            <option value="bkash">বিকাশ (Bkash)</option>
+                            <option value="nagad">নগদ (Nagad)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">নম্বর</label>
+                        <input type="text" id="withdraw-number" class="form-input" placeholder="আপনার ফোন নম্বর">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">পরিমাণ (TK)</label>
+                        <input type="number" id="withdraw-amount" class="form-input" placeholder="নূন্যতম TK 1300" min="1300">
+                    </div>
+                    <div class="button-group">
+                        <button onclick="closeWithdrawalModal()" class="button-secondary">বাতিল</button>
+                        <button onclick="submitWithdrawal()" class="button-primary">রিকোয়েস্ট পাঠান</button>
+                    </div>
+                </div>
+            </div>
+
+                      <!-- Mystery Box Modal -->
+            <div id="box-modal" class="modal">
+                <div class="modal-content text-center">
+                    <h2 class="text-2xl font-bold text-white mb-6">মিস্ট্রি বক্স 🎁</h2>
+                    
+                    <!-- Opening Animation -->
+                    <div id="opening-animation" class="py-8">
+                        <div class="text-7xl animate-bounce">🎁</div>
+                        <p class="text-[#00E5FF] mt-6 font-bold animate-pulse">বক্স খোলা হচ্ছে...</p>
+                    </div>
+
+                    <!-- Reward Result -->
+                    <div id="reward-result" class="hidden transform scale-90 transition-transform duration-500 py-6">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <p class="text-slate-300 font-bold mb-2">অভিনন্দন! আপনি পেয়েছেন</p>
+                        <h3 id="reward-amount" class="text-4xl font-black text-[#00E5FF] mb-6">TK 0.00</h3>
+                        <button onclick="closeBoxModal()" class="w-full bg-[#00E5FF] text-[#0A192F] py-3 rounded-xl font-bold">রিওয়ার্ড সংগ্রহ করুন</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Modals -->
+            <div id="withdrawalHistoryModal" class="modal">
+                <div class="modal-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">উইথড্র হিস্ট্রি</h2>
+                        <button onclick="closeWithdrawalHistoryModal()" class="p-2 hover:bg-[#233554] rounded-lg">❌</button>
+                    </div>
+                    <div id="dynamic-withdrawal-history" class="text-center py-10"><p class="text-slate-400">কোনো রেকর্ড পাওয়া যায়নি</p></div>
+                    <button onclick="closeWithdrawalHistoryModal()" class="w-full mt-6 button-primary">বন্ধ করুন</button>
+                </div>
+            </div>
+
+            <div id="transactionModal" class="modal">
+                <div class="modal-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">ট্রানজেকশন হিস্ট্রি</h2>
+                        <button onclick="closeTransactionModal()" class="p-2 hover:bg-[#233554] rounded-lg">❌</button>
+                    </div>
+                    <div id="dynamic-transaction-history" class="text-center py-10"><p class="text-slate-400">কোনো রেকর্ড পাওয়া যায়নি</p></div>
+                    <button onclick="closeTransactionModal()" class="w-full mt-6 button-primary">বন্ধ করুন</button>
+                </div>
+            </div>
+            
+            <!-- Toast Notification -->
+            <div id="toast" class="fixed top-4 right-4 bg-[#112240] border border-[#00E5FF] text-white px-6 py-3 rounded-lg shadow-xl transform transition-all duration-300 -translate-y-full opacity-0 pointer-events-none z-[60]">
+                <p id="toastMessage" class="font-bold"></p>
+            </div>
+        </div>
+
+       
+    </div>
+
+    <!-- ================= BOTTOM NAVIGATION ================= -->
+    <div class="fixed bottom-0 left-0 right-0 bg-[#112240]/95 backdrop-blur-lg border-t border-[#233554] px-2 py-3 z-50">
+        <div class="flex items-center justify-around max-w-lg mx-auto">
+            <div onclick="switchTab('home')" class="nav-button active" id="nav-home">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.707.707a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span>হোম</span>
+            </div>
+            <div onclick="switchTab('tasks')" class="nav-button" id="nav-tasks">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span>টাস্ক</span>
+            </div>
+            <div onclick="switchTab('support')" class="nav-button" id="nav-support">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path></svg>
+                <span>সাপোর্ট</span>
+            </div>
+            <div onclick="switchTab('referral')" class="nav-button" id="nav-referral">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span>রেফার</span>
+            </div>
+            <div onclick="switchTab('wallet')" class="nav-button" id="nav-wallet">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H5a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <span>ওয়ালেট</span>
+            </div>
+        </div>
+    </div>
+      <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">নোটিফিকেশন</h2>
+                <button onclick="closeNotificationModal()" class="p-2 hover:bg-[#233554] rounded-lg">❌</button>
+            </div>
+            <div id="notification-message" class="bg-[#0A192F] border border-[#233554] rounded-xl p-4 text-slate-300">
+                কোনো নতুন নোটিফিকেশন নেই।
+            </div>
+            <button onclick="closeNotificationModal()" class="w-full mt-6 button-primary">বন্ধ করুন</button>
+        </div>
+    </div>
+
+   
+    <script>
+        // ১. আপনার Firebase প্রজেক্টের কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyAle4q_TRJoMeQc_LtusSI2s4FtXQyfha4",
+            authDomain: "flycashdemo.firebaseapp.com",
+            databaseURL: "https://flycashdemo-default-rtdb.firebaseio.com",
+            projectId: "flycashdemo",
+            storageBucket: "flycashdemo.firebasestorage.app",
+            messagingSenderId: "431352487997",
+            appId: "1:431352487997:web:2c12a04f751a97ed1c0a54"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        // ২. Telegram WebApp থেকে ইউজার ইনফরমেশন
+        const tgApp = window.Telegram.WebApp;
+        tgApp.expand();
+        
+        const tgUser = tgApp.initDataUnsafe?.user || { 
+            id: 'test_user_001', 
+            first_name: 'Test', 
+            last_name: 'User',
+            username: 'testuser'
+        };
+
+        const userId = tgUser.id.toString();
+        const userName = (tgUser.first_name + ' ' + (tgUser.last_name || '')).trim();
+
+        // গ্লোবাল ভেরিয়েবল
+        let currentAdReward = 0;
+        let currentRefBonus = 0;
+        let currentGigapubId = "";
+        let currentAdsgramId = "";
+        let adsgramController = null;
+        let userAdsWatched = 0;
+        let userBoxAdsWatched = 0;
+        let userBoxesOpened = 0;
+
+        // ৩. অ্যাপ ইনিশিয়ালাইজেশন
+        function initDynamicApp() {
+            document.getElementById('ui-user-name').innerText = userName;
+            document.getElementById('ui-user-initial').innerText = userName.charAt(0).toUpperCase();
+            document.getElementById('ui-wallet-name').innerText = userName;
+            document.getElementById('ui-wallet-initial').innerText = userName.charAt(0).toUpperCase();
+
+            db.ref('settings/botUsername').on('value', (snap) => {
+                const botUsername = snap.val() || "NanoEarn_bot";
+                document.getElementById('refLinkInput').value = `https://t.me/${botUsername}/app?startapp=${userId}`;
+            });
+
+            db.ref('settings').on('value', (snapshot) => {
+                const settings = snapshot.val() || {};
+                
+                currentAdReward = parseFloat(settings.adReward || 20);
+                currentRefBonus = parseFloat(settings.refBonus || 100);
+                
+                document.querySelectorAll('#ui-ad-reward, #ui-ad-reward-pill').forEach(el => el.innerText = currentAdReward.toFixed(2));
+                document.querySelectorAll('#ui-ref-bonus-text, #ui-ref-bonus-pill').forEach(el => el.innerText = currentRefBonus.toFixed(2));
+                
+                document.getElementById('ui-tutorial-link').href = settings.tutorialVideo || "#";
+                document.getElementById('ui-support-link').href = settings.supportLink || "#";
+
+                // Box Limits
+                window.boxMin = parseFloat(settings.boxMin || 5);
+                window.boxMax = parseFloat(settings.boxMax || 50);
+
+                // Withdraw Limits
+                window.minWithdrawAmount = parseFloat(settings.minWithdraw || 1300);
+                document.getElementById('withdraw-amount').placeholder = `নূন্যতম TK ${window.minWithdrawAmount}`;
+                document.getElementById('withdraw-amount').min = window.minWithdrawAmount;
+
+                          // --- এই অংশটুকু রিপ্লেস করুন ---
+                if(settings.gigapubId && settings.gigapubId !== currentGigapubId) {
+                    currentGigapubId = settings.gigapubId;
+                    
+                    // পুরনো স্ক্রিপ্ট রিমুভ করে নতুন করে ইনজেক্ট করা হচ্ছে
+                    const oldScript = document.getElementById('dynamic-gigapub-script');
+                    if(oldScript) oldScript.remove();
+                    
+                    const script = document.createElement('script');
+                    script.id = 'dynamic-gigapub-script';
+                    script.src = `https://ad.gigapub.tech/script?id=${currentGigapubId}`;
+                    document.head.appendChild(script);
+                }
+                
+                if(settings.adsgramId && settings.adsgramId !== currentAdsgramId && window.Adsgram) {
+                    currentAdsgramId = settings.adsgramId;
+                    adsgramController = window.Adsgram.init({ blockId: currentAdsgramId });
+                }
+                // ---------------------------------
+
+              
+            });
+
+            db.ref('users/' + userId).on('value', (snapshot) => {
+                let userData = snapshot.val();
+                
+                if (!userData) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const referrerId = tgApp.initDataUnsafe?.start_param || urlParams.get('startapp') || 'None';
+
+                    userData = {
+                        name: userName,
+                        photoUrl: tgUser.photo_url || '',
+                        referredBy: referrerId,
+                        balance: 0, bonusBalance: 0, totalTasks: 0, totalRefs: 0, adsWatched: 0, boxAdsWatched: 0, boxesOpened: 0, dailyCheckin: 0, lastCheckin: 0, paymentNumber: ""
+                    };
+                    db.ref('users/' + userId).set(userData);
+
+                    if(referrerId !== 'None' && referrerId !== userId) {
+                        db.ref('users/' + referrerId + '/balance').set(firebase.database.ServerValue.increment(currentRefBonus));
+                        db.ref('users/' + referrerId + '/totalRefs').set(firebase.database.ServerValue.increment(1));
+                        
+                        db.ref(`referrals/${referrerId}/${userId}`).set({
+                            name: userName, bonus: currentRefBonus, timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        
+                        db.ref(`history/${referrerId}/transactions`).push({
+                            title: `রেফারেল বোনাস (${userName})`, amount: currentRefBonus, timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
+                }
+
+                document.getElementById('ui-main-balance').innerText = parseFloat(userData.balance || 0).toFixed(2);
+                document.getElementById('ui-wallet-balance').innerText = parseFloat(userData.balance || 0).toFixed(2);
+                document.getElementById('ui-bonus-balance').innerText = parseFloat(userData.bonusBalance || 0).toFixed(2);
+                document.getElementById('ui-total-tasks').innerText = userData.totalTasks || 0;
+                document.getElementById('ui-total-refs').innerText = userData.totalRefs || 0;
+                
+                userAdsWatched = userData.adsWatched || 0;
+                document.getElementById('ui-total-ads').innerText = userAdsWatched;
+                document.getElementById('ui-daily-ads-watched').innerText = userAdsWatched;
+                document.getElementById('ui-withdraw-ads-watched').innerText = userAdsWatched;
+                
+                let progressPercent = Math.min((userAdsWatched / 15) * 100, 100);
+                document.getElementById('ui-daily-ads-progress').style.width = progressPercent + "%";
+
+                userBoxAdsWatched = userData.boxAdsWatched || 0;
+                userBoxesOpened = userData.boxesOpened || 0;
+                document.getElementById('ui-box-ad-count').innerText = userBoxAdsWatched;
+                document.getElementById('ui-box-progress-text').innerText = userBoxAdsWatched;
+                document.getElementById('ui-box-opened').innerText = userBoxesOpened;
+                
+                let boxProgressPercent = Math.min((userBoxAdsWatched / 3) * 100, 100);
+                document.getElementById('box-progress-fill').style.width = boxProgressPercent + "%";
+
+                if (userBoxAdsWatched >= 3) {
+                    document.getElementById('mysteryAdBtn').innerText = "বক্স খুলুন";
+                    document.getElementById('mysteryAdBtn').setAttribute("onclick", "openMysteryBox()");
+                } else {
+                    document.getElementById('mysteryAdBtn').innerText = `অ্যাড দেখুন (${userBoxAdsWatched + 1}ম অ্যাড)`;
+                    document.getElementById('mysteryAdBtn').setAttribute("onclick", "watchMysteryBoxAd(this)");
+                }
+
+                renderDailyBonus(userData.dailyCheckin || 0, userData.lastCheckin || 0);
+                if(userData.paymentNumber) document.getElementById('user-payment-number').value = userData.paymentNumber;
+
+                if(userData.leaderboardName) {
+                    document.getElementById('leaderboard-name').value = userData.leaderboardName;
+                    document.getElementById('leaderboard-age').value = userData.age || '';
+                    document.getElementById('leaderboard-number').value = userData.paymentNumber || '';
+                    document.getElementById('saveProfileBtn').innerText = "প্রোফাইল আপডেট করুন";
+                    document.getElementById('top-users-list').classList.remove('hidden');
+                }
+            });
+
+            db.ref('tasks').on('value', (snapshot) => { renderTasks(snapshot.val() || {}); });
+            loadReferrals();
+            loadHistory();
+            
+            // Check for notifications
+            db.ref('settings/notification').on('value', snap => {
+                if(snap.val()) document.getElementById('notification-badge').classList.remove('hidden');
+            });
+        }
+
+        // ================= TASKS LOGIC =================
+        function renderTasks(tasks) {
+            const container = document.getElementById('dynamic-tasks-container');
+            container.innerHTML = ''; 
+            Object.keys(tasks).forEach(key => {
+                const task = tasks[key];
+                if(task.active) {
+                    const isTelegram = task.type === 'telegram';
+                    container.innerHTML += `
+                    <div class="task-card">
+                        <div class="task-icon">
+                            <svg class="w-6 h-6 text-[#00E5FF]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.483.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        </div>
+                        <div class="task-content">
+                            <p class="font-bold text-white">${task.title}</p>
+                            <p class="text-sm text-slate-400">রিওয়ার্ড: TK ${parseFloat(task.reward).toFixed(2)}</p>
+                        </div>
+                        <button id="btn-task-${key}" class="task-button blue" onclick="executeTask('${key}', '${task.link}', ${task.reward}, '${task.title}', ${isTelegram})">
+                            ${isTelegram ? 'জয়েন করুন' : 'টাস্ক দেখুন'}
+                        </button>
+                    </div>`;
+                }
+            });
+            if(container.innerHTML === '') container.innerHTML = '<p class="text-slate-400 text-center text-sm py-4">বর্তমানে কোনো টাস্ক নেই</p>';
+        }
+        function executeTask(taskId, link, reward, title, isTelegram) {
+            // Error Handling যোগ করা হয়েছে যাতে লিংক ওপেন হতে ফেইল করলেও টাইমার চলে
+            try {
+                if (tgApp && typeof tgApp.openTelegramLink === 'function' && link.includes('t.me')) {
+                    tgApp.openTelegramLink(link);
+                } else {
+                    window.open(link, '_blank');
+                }
+            } catch (error) {
+                console.log("Link open issue, but continuing task logic...", error);
+            }
+
+            const btn = document.getElementById(`btn-task-${taskId}`);
+            if(!btn) return;
+            
+            if(isTelegram) {
+                btn.textContent = 'ভেরিফাইং...';
+                btn.classList.add('blue-outline');
+                btn.classList.remove('blue');
+                btn.disabled = true;
+                
+                db.ref(`task_verifications/${taskId}_${userId}`).set({
+                    userId: userId, taskId: taskId, title: title, reward: reward, status: 'pending_bot_check', timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                showToast('বট চেক করছে আপনি জয়েন হয়েছেন কি না...', 'success');
+
+                const checkInterval = setInterval(() => {
+                    db.ref(`task_verifications/${taskId}_${userId}/status`).once('value').then(snap => {
+                        const status = snap.val();
+                        if(status === 'approved') {
+                            clearInterval(checkInterval);
+                            btn.textContent = 'সম্পন্ন';
+                            btn.style.backgroundColor = '#233554';
+                            btn.style.color = '#94a3b8';
+                            showToast(`TK ${reward} যুক্ত হয়েছে।`, 'success');
+                        } else if(status === 'rejected') {
+                            clearInterval(checkInterval);
+                            btn.textContent = 'আবার জয়েন করুন';
+                            btn.disabled = false;
+                            showToast(`আপনি চ্যানেলে জয়েন হননি!`, 'error');
+                        }
+                    });
+                }, 3000);
+            } else {
+                btn.disabled = true;
+                let timeLeft = 15;
+                const timerInterval = setInterval(() => {
+                    btn.textContent = `অপেক্ষা করুন (${timeLeft}s)`;
+                    timeLeft--;
+                    if(timeLeft < 0) {
+                        clearInterval(timerInterval);
+                        btn.textContent = 'ক্লেম করুন';
+                        btn.disabled = false;
+                        btn.onclick = () => claimTaskReward(taskId, reward, title, btn);
+                    }
+                }, 1000);
+            }
+        }
+
+      
+        function claimTaskReward(taskId, reward, title, btn) {
+            btn.disabled = true;
+            addBalance(reward);
+            addTransactionHistory(title, reward);
+            btn.textContent = 'সম্পন্ন';
+            btn.style.backgroundColor = '#233554';
+            btn.style.borderColor = '#233554';
+            btn.style.color = '#94a3b8';
+            showToast(`TK ${reward} যুক্ত হয়েছে।`, 'success');
+        }
+
+      
+          function watchTaskAd() {
+            // ID ফিক্স করা হয়েছে: watchAdBtn
+            const btn = document.getElementById('watchAdBtn');
+            if(!btn) return; 
+            
+            const originalText = btn.innerText;
+            btn.innerText = "অ্যাড লোড হচ্ছে...";
+            btn.disabled = true;
+
+            if (adsgramController) {
+                adsgramController.show()
+                    .then(() => handleAdSuccess(btn, originalText, currentAdReward, false))
+                    .catch(() => showGigaPubAd(btn, originalText, false));
+            } else {
+                showGigaPubAd(btn, originalText, false);
+            }
+        }
+    
+        function watchMysteryBoxAd(btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "লোড হচ্ছে...";
+            btn.disabled = true;
+
+            if (adsgramController) {
+                adsgramController.show().then(() => handleAdSuccess(btn, originalText, 0, true)).catch(() => showGigaPubAd(btn, originalText, true));
+            } else {
+                showGigaPubAd(btn, originalText, true);
+            }
+        }
+
+              function showGigaPubAd(btn, originalText, isBox) {
+            if (typeof window.showGiga === 'function') {
+                window.showGiga().then(() => {
+                    handleAdSuccess(btn, originalText, isBox ? 0 : currentAdReward, isBox);
+                }).catch(e => {
+                    showToast('অ্যাডটি সম্পূর্ণ দেখুন অথবা কিছুক্ষণ পর আবার চেষ্টা করুন!', 'error');
+                    resetBtn(btn, originalText);
+                });
+            } else {
+                showToast('অ্যাড লোড হচ্ছে না! অ্যাড-ব্লকার বন্ধ করুন অথবা একটু অপেক্ষা করুন।', 'error');
+                resetBtn(btn, originalText);
+            }
+        }
+
+      /* function showGigaPubAd(btn, originalText, isBox) {
+            if (typeof window.showGiga === 'function') {
+                window.showGiga().then(() => handleAdSuccess(btn, originalText, isBox ? 0 : currentAdReward, isBox)).catch(e => {
+                    showToast('অ্যাডটি সম্পূর্ণ দেখুন অথবা কিছুক্ষণ পর আবার চেষ্টা করুন!', 'error');
+                    resetBtn(btn, originalText);
+                });
+            } else {
+                showToast('অ্যাডের স্ক্রিপ্ট লোড হয়নি। দয়া করে পেজটি রিলোড করুন।', 'error');
+                resetBtn(btn, originalText);
+            }
+        }
+*/
+        function handleAdSuccess(btn, originalText, reward, isBox) {
+            const userRef = db.ref('users/' + userId);
+            if (isBox) {
+                userRef.child('boxAdsWatched').set(userBoxAdsWatched + 1);
+            } else {
+                addBalance(reward);
+                addTransactionHistory("অ্যাড দেখা", reward);
+                userRef.child('adsWatched').set(userAdsWatched + 1);
+                showToast(`TK ${reward} যুক্ত হয়েছে।`, 'success');
+            }
+            resetBtn(btn, originalText);
+        }
+
+        function resetBtn(btn, text) { btn.innerText = text; btn.disabled = false; }
+
+     
+            // ================= MYSTERY BOX LOGIC =================
+        function openMysteryBox() {
+            if (userBoxAdsWatched < 3) return;
+
+            const modal = document.getElementById('box-modal');
+            const anim = document.getElementById('opening-animation');
+            const result = document.getElementById('reward-result');
+            const rewardAmt = document.getElementById('reward-amount');
+
+            // মডাল এবং অ্যানিমেশন চালু করা
+            modal.classList.add('active');
+            anim.classList.remove('hidden');
+            result.classList.add('hidden');
+            result.classList.remove('scale-100');
+
+            // অ্যাডমিন প্যানেল থেকে সেট করা Min ও Max এর মধ্যে রেন্ডম রিওয়ার্ড
+            const min = window.boxMin || 5;
+            const max = window.boxMax || 50;
+            const randomReward = Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // ২ সেকেন্ড অ্যানিমেশন চলার পর রিওয়ার্ড শো করবে
+            setTimeout(() => {
+                anim.classList.add('hidden');
+                result.classList.remove('hidden');
+                setTimeout(() => result.classList.add('scale-100'), 50);
+                rewardAmt.innerText = 'TK ' + randomReward.toFixed(2);
+                
+                // ডেটাবেজ আপডেট এবং ব্যালেন্স অ্যাড
+                db.ref('users/' + userId).update({ boxAdsWatched: 0, boxesOpened: userBoxesOpened + 1 });
+                addBalance(randomReward);
+                addTransactionHistory("মিষ্টি বক্স", randomReward);
+            }, 2000);
+        }
+
+        function closeBoxModal() { 
+            document.getElementById('box-modal').classList.remove('active'); 
+        }
+  
+        // ================= DAILY BONUS LOGIC =================
+        function renderDailyBonus(currentDay, lastCheckin) {
+            const grid = document.getElementById('daily-bonus-grid');
+            const btn = document.getElementById('claimCheckinBtn');
+            const statusBox = document.getElementById('bonus-status-claimed');
+            grid.innerHTML = '';
+            
+            db.ref('settings/dailyRewards').once('value').then(snap => {
+                const adminRewards = snap.val();
+                const rewards = adminRewards ? adminRewards.split(',').map(Number) : [20, 35, 45, 60, 75, 85, 100];
+                const now = Date.now();
+                const oneDay = 24 * 60 * 60 * 1000;
+                const canClaim = (now - lastCheckin) > oneDay;
+
+                document.getElementById('ui-daily-progress').innerText = Math.min(currentDay + 1, 7);
+
+                for (let i = 0; i < 7; i++) {
+                    let statusClass = "bg-[#0A192F] border border-[#233554] text-slate-500";
+                    let checkIcon = "";
+                    
+                    if (i < currentDay) {
+                        statusClass = "bg-[#10B981]/20 border border-[#10B981]/30 text-[#10B981]";
+                        checkIcon = `<div class="absolute -top-1 -right-1 bg-white rounded-full p-0.5"><svg class="w-3 h-3 text-[#10B981]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>`;
+                    } else if (i === currentDay) {
+                        statusClass = "bg-[#00E5FF] text-[#0A192F] shadow-lg shadow-[#00E5FF]/20";
+                    }
+
+                    grid.innerHTML += `
+                        <div class="flex flex-col items-center">
+                            <div class="w-full aspect-square rounded-2xl flex flex-col items-center justify-center relative transition-all duration-300 ${statusClass}">
+                                <span class="text-[9px] font-black uppercase mb-1">${i+1}ম দিন</span>
+                                <span class="text-xs font-black">TK ${rewards[i] || 0}</span>
+                                ${checkIcon}
+                            </div>
+                        </div>`;
+                }
+
+                if (canClaim && currentDay < 7) {
+                    btn.style.display = 'block';
+                    statusBox.style.display = 'none';
+                    btn.innerText = `এখনই ক্লেইম করুন (${currentDay + 1}ম দিন)`;
+                    btn.onclick = () => claimDailyBonus(rewards[currentDay] || 0, currentDay);
+                } else {
+                    btn.style.display = 'none';
+                    statusBox.style.display = 'block';
+                }
+            });
+        }
+
+        function claimDailyBonus(reward, currentDay) {
+            db.ref('users/' + userId).transaction((userData) => {
+                if (userData) {
+                    userData.balance = (userData.balance || 0) + reward;
+                    userData.dailyCheckin = currentDay + 1;
+                    userData.lastCheckin = firebase.database.ServerValue.TIMESTAMP;
+                }
+                return userData;
+            }, (error, committed) => {
+                if(committed) {
+                    addTransactionHistory(`ডেইলি বোনাস (${currentDay+1}ম দিন)`, reward);
+                    showToast(`TK ${reward} বোনাস সংগ্রহ করা হয়েছে!`, 'success');
+                }
+            });
+        }
+
+        // ================= WALLET & WITHDRAW LOGIC =================
+        function addBalance(amount) {
+            db.ref('users/' + userId).transaction((userData) => {
+                if (userData) {
+                    userData.balance = (userData.balance || 0) + parseFloat(amount);
+                    userData.totalTasks = (userData.totalTasks || 0) + 1;
+                }
+                return userData;
+            });
+        }
+
+        function submitWithdrawal() {
+            const number = document.getElementById('withdraw-number').value;
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('paymentMethod').value;
+            
+            if (userAdsWatched < 20) return showToast('উইথড্র করার জন্য অন্তত ২০টি অ্যাড দেখতে হবে!', 'error');
+            if(!number || number.length < 11) return showToast('সঠিক মোবাইল নম্বর দিন!', 'error');
+            if(!amount || amount < (window.minWithdrawAmount || 1300)) return showToast(`ন্যূনতম উইথড্র পরিমাণ ${window.minWithdrawAmount} টাকা!`, 'error');
+
+            db.ref('users/' + userId + '/balance').once('value').then(snapshot => {
+                const bal = snapshot.val() || 0;
+                if(bal >= amount) {
+                    db.ref('withdraw_requests').push({
+                        userId: userId, name: userName, number: number, method: method, amount: amount, status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        db.ref('users/' + userId + '/balance').set(bal - amount);
+                        addWithdrawalHistory(method, number, amount, 'pending');
+                        showToast('উইথড্র রিকোয়েস্ট সফল হয়েছে!', 'success');
+                        closeWithdrawalModal();
+                    });
+                } else {
+                    showToast('পর্যাপ্ত ব্যালেন্স নেই!', 'error');
+                }
+            });
+        }
+
+        // ================= HISTORY LOGIC =================
+        function addTransactionHistory(title, amount) {
+            db.ref(`history/${userId}/transactions`).push({ title: title, amount: amount, timestamp: firebase.database.ServerValue.TIMESTAMP });
+        }
+
+        function addWithdrawalHistory(method, number, amount, status) {
+            db.ref(`history/${userId}/withdrawals`).push({ method: method, number: number, amount: amount, status: status, timestamp: firebase.database.ServerValue.TIMESTAMP });
+        }
+
+        function loadHistory() {
+            db.ref(`history/${userId}/transactions`).limitToLast(10).on('value', snap => {
+                const container = document.getElementById('dynamic-transaction-history');
+                const data = snap.val();
+                if(data) {
+                    container.innerHTML = '';
+                    Object.values(data).reverse().forEach(item => {
+                        container.innerHTML += `
+                        <div class="flex items-center justify-between p-4 bg-slate-50/10 rounded-xl border border-slate-500/20 mb-2">
+                            <div><p class="font-bold text-white text-sm">${item.title}</p><p class="text-xs text-slate-400">${new Date(item.timestamp).toLocaleString()}</p></div>
+                            <div class="text-right"><p class="font-bold text-emerald-400">+TK ${parseFloat(item.amount).toFixed(2)}</p></div>
+                        </div>`;
+                    });
+                }
+            });
+
+            db.ref(`history/${userId}/withdrawals`).limitToLast(10).on('value', snap => {
+                const container = document.getElementById('dynamic-withdrawal-history');
+                const data = snap.val();
+                if(data) {
+                    container.innerHTML = '';
+                    Object.values(data).reverse().forEach(item => {
+                        let statusColor = item.status === 'pending' ? 'text-amber-400' : (item.status === 'approved' ? 'text-emerald-400' : 'text-red-400');
+                        container.innerHTML += `
+                        <div class="flex items-center justify-between p-4 bg-slate-50/10 rounded-xl border border-slate-500/20 mb-2">
+                            <div><p class="font-bold text-white text-sm uppercase">${item.method}</p><p class="text-xs text-slate-400">${new Date(item.timestamp).toLocaleString()}</p></div>
+                            <div class="text-right"><p class="font-bold text-white">TK ${parseFloat(item.amount).toFixed(2)}</p><p class="text-xs font-bold ${statusColor}">${item.status}</p></div>
+                        </div>`;
+                    });
+                }
+            });
+        }
+
+        // ================= REFERRAL LOGIC =================
+        function loadReferrals() {
+            db.ref(`referrals/${userId}`).on('value', snap => {
+                const data = snap.val();
+                const container = document.getElementById('dynamic-referrals-container');
+                if(data) {
+                    document.getElementById('ui-referral-list-count').innerText = Object.keys(data).length;
+                    container.innerHTML = '';
+                    Object.values(data).reverse().forEach(ref => {
+                        container.innerHTML += `
+                        <div class="flex items-center justify-between p-4 bg-[#112240] rounded-xl border border-[#233554] mb-2">
+                            <div><p class="font-bold text-white">${ref.name}</p><p class="text-xs text-slate-400">${new Date(ref.timestamp).toLocaleDateString()}</p></div>
+                            <div class="text-right"><p class="font-bold text-[#00E5FF]">+TK ${parseFloat(ref.bonus).toFixed(2)}</p></div>
+                        </div>`;
+                    });
+                } else {
+                    document.getElementById('ui-referral-list-count').innerText = 0;
+                    container.innerHTML = `<div class="text-center py-10 bg-[#112240] rounded-xl border border-[#233554] border-dashed"><p class="text-slate-400 text-sm">এখনো কোনো বন্ধু নেই</p></div>`;
+                }
+            });
+        }
+
+        // ================= LEADERBOARD LOGIC =================
+        function saveLeaderboardProfile() {
+            const name = document.getElementById('leaderboard-name').value;
+            const age = document.getElementById('leaderboard-age').value;
+            const number = document.getElementById('leaderboard-number').value;
+
+            if(!name || !age || !number) return showToast('সবগুলো তথ্য পূরণ করুন', 'error');
+
+            db.ref('users/' + userId).update({ leaderboardName: name, age: age, paymentNumber: number }).then(() => {
+                showToast('প্রোফাইল সেভ হয়েছে!', 'success');
+            });
+        }
+
+        function switchLeaderboardTab(type) {
+            if(type === 'ads') {
+                document.getElementById('lb-tab-ads').classList.replace('bg-[#112240]', 'bg-[#00E5FF]');
+                document.getElementById('lb-tab-ads').classList.replace('text-slate-400', 'text-[#0A192F]');
+                document.getElementById('lb-tab-refs').classList.replace('bg-[#00E5FF]', 'bg-[#112240]');
+                document.getElementById('lb-tab-refs').classList.replace('text-[#0A192F]', 'text-slate-400');
+                document.getElementById('ui-rank-type').innerText = 'অ্যাড';
+                loadLeaderboardData('adsWatched', 'টি অ্যাড');
+            } else {
+                document.getElementById('lb-tab-refs').classList.replace('bg-[#112240]', 'bg-[#00E5FF]');
+                document.getElementById('lb-tab-refs').classList.replace('text-slate-400', 'text-[#0A192F]');
+                document.getElementById('lb-tab-ads').classList.replace('bg-[#00E5FF]', 'bg-[#112240]');
+                document.getElementById('lb-tab-ads').classList.replace('text-[#0A192F]', 'text-slate-400');
+                document.getElementById('ui-rank-type').innerText = 'রেফার';
+                loadLeaderboardData('totalRefs', 'টি রেফার');
+            }
+        }
+
+        function loadLeaderboardData(orderBy, suffix) {
+            document.getElementById('ui-rank-name').innerText = userName;
+            
+            db.ref('users').orderByChild(orderBy).limitToLast(10).on('value', snap => {
+                const container = document.getElementById('dynamic-leaderboard-list');
+                container.innerHTML = '';
+                const users = [];
+                snap.forEach(child => { users.push({id: child.key, ...child.val()}); });
+                
+                users.reverse();
+                let myRank = 'N/A';
+                let myScore = orderBy === 'adsWatched' ? userAdsWatched : (document.getElementById('ui-total-refs').innerText);
+
+                users.forEach((u, index) => {
+                    if(u.id === userId) myRank = index + 1;
+                    let initial = (u.name || 'U').charAt(0).toUpperCase();
+                    let score = u[orderBy] || 0;
+                    
+                    container.innerHTML += `
+                    <div class="flex items-center justify-between p-4 bg-[#112240] border border-[#233554] rounded-xl mb-2">
+                        <div class="flex items-center gap-4">
+                            <span class="text-slate-500 font-bold">${index + 1}</span>
+                            <div class="w-10 h-10 rounded-full bg-[#0A192F] flex items-center justify-center text-[#00E5FF] border border-[#233554]">${initial}</div>
+                            <span class="font-bold text-white">${u.name || 'User'}</span>
+                        </div>
+                        <span class="font-bold text-[#00E5FF]">${score} <span class="text-xs text-slate-400">${suffix.split(' ')[1]}</span></span>
+                    </div>`;
+                });
+                
+                document.getElementById('ui-my-rank').innerText = myRank;
+                document.getElementById('ui-my-score').innerText = myScore + ' ' + suffix;
+            });
+        }
+
+        // ================= MODALS & UTILS =================
+        function openWithdrawalModal() { document.getElementById('withdrawalModal').classList.add('active'); }
+        function closeWithdrawalModal() { document.getElementById('withdrawalModal').classList.remove('active'); }
+        function openWithdrawalHistoryModal() { document.getElementById('withdrawalHistoryModal').classList.add('active'); loadHistory(); }
+        function closeWithdrawalHistoryModal() { document.getElementById('withdrawalHistoryModal').classList.remove('active'); }
+        function openTransactionModal() { document.getElementById('transactionModal').classList.add('active'); loadHistory(); }
+        function closeTransactionModal() { document.getElementById('transactionModal').classList.remove('active'); }
+        
+        function openNotificationModal() {
+            document.getElementById('notificationModal').classList.add('active');
+            document.getElementById('notification-badge').classList.add('hidden');
+            db.ref('settings/notification').once('value').then(snap => {
+                if(snap.val()) document.getElementById('notification-message').innerText = snap.val();
+            });
+        }
+        function closeNotificationModal() { document.getElementById('notificationModal').classList.remove('active'); }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.style.borderColor = type === 'success' ? '#00E5FF' : '#ef4444';
+            toast.classList.remove('-translate-y-full', 'opacity-0');
+            setTimeout(() => toast.classList.add('-translate-y-full', 'opacity-0'), 3000);
+        }
+
+        function logoutApp() { if(confirm("লগআউট করতে চান?")) if (tgApp) tgApp.close(); }
+
+        setTimeout(() => switchLeaderboardTab('ads'), 2000);
+        window.onload = () => initDynamicApp();
+    </script>
+
+      
+    <!-- UI Logic Script -->
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabId + '-view').classList.add('active');
+            // Highlight selected nav button
+            document.getElementById('nav-' + tabId).classList.add('active');
+            
+            // Scroll to top safely
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Dummy loader remove (will be handled by Firebase in Part 2)
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 1500);
+
+        // UI Ticker Animation (from Home Page)
+        const names = ['Rahim', 'Karim', 'Sujon', 'Akash', 'Monir', 'Nusrat', 'Priya', 'Admin', 'Masud'];
+        function startTicker() {
+            const container = document.getElementById('live-withdrawal-container');
+            const wrapperWidth = container.parentElement.offsetWidth;
+            
+            function animate() {
+                const name = names[Math.floor(Math.random() * names.length)];
+                const amount = Math.floor(Math.random() * 8800) + 1200;
+                container.innerHTML = `🎉 <span class="text-[#00E5FF] font-bold">${name}***</span> <span class="text-slate-400">মাত্র</span> <span class="text-[#00E5FF] font-black">TK ${amount}</span> <span class="text-slate-400">উইথড্র করেছেন</span>`;
+                
+                container.style.transition = 'none';
+                container.style.transform = `translateX(${wrapperWidth}px)`;
+                void container.offsetHeight; 
+                
+                const duration = 6000 + Math.random() * 2000;
+                container.style.transition = `transform ${duration}ms linear`;
+                container.style.transform = `translateX(-${container.offsetWidth}px)`;
+                setTimeout(animate, duration);
+            }
+            animate();
+        }
+        startTicker();
+
+        // Copy Referral Link
+        function copyRefLink() {
+            const input = document.getElementById('refLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value).then(() => alert('লিংক কপি করা হয়েছে!'));
+        }
+
+        function shareRefLink() {
+            const link = document.getElementById('refLinkInput').value;
+            const text = "বন্ধুদের রেফার করুন এবং ইনকাম করুন! লিংক:";
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
